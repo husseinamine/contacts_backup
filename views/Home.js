@@ -79,9 +79,14 @@ class Home extends React.Component {
 
                                     for (const contact of contacts) {
                                         contactsCounter++
-                                    
-                                        console.log(`Adding Contacts (${contactsCounter}/${contacts.length})`)
-                                        Contacts.addContact(contact)
+                                        
+                                        Contacts.getContactsMatchingString(contact.givenName)
+                                            .then(givenContact => {
+                                                if (JSON.stringify(contact) !== JSON.stringify(givenContact)) {
+                                                    console.log(`Adding Contacts (${contactsCounter}/${contacts.length})`)
+                                                    Contacts.addContact(contact)
+                                                }
+                                            })
                                         
                                         this.setState(prevState => {
                                             return {
