@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, PermissionsAndroid } from "react-native"
+import { View, StyleSheet, PermissionsAndroid, Text, ActivityIndicator } from "react-native"
 import Logo from "../components/Logo"
 import Button from "../components/Button"
 import auth from "@react-native-firebase/auth"
@@ -30,9 +30,25 @@ class Home extends React.Component {
         this.getContacts = this.getContacts.bind(this)
         this.uploadContacts = this.uploadContacts.bind(this)
         this.onSignOut = this.onSignOut.bind(this)
+        this.componentDidMount = this.componentDidMount.bind(this)
+    }
+
+    componentDidMount() {
+        PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS)
+        PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+        
     }
 
     getContacts() {
+
+        this.setState(prevState => {
+            return {
+                ...prevState,
+                message: `Adding Contacts`,
+                spinner: true
+            }
+        })
+
         let message
         let messageColor
         let permission
@@ -63,21 +79,41 @@ class Home extends React.Component {
 
                                     for (const contact of contacts) {
                                         contactsCounter++
-
-                                        this.message.showMessage(`Adding Contacts (${contactsCounter}/${contacts.length})`, 3000)
+                                    
                                         console.log(`Adding Contacts (${contactsCounter}/${contacts.length})`)
                                         Contacts.addContact(contact)
+                                        
+                                        this.setState(prevState => {
+                                            return {
+                                                ...prevState,
+                                                message: `Adding Contacts (${contactsCounter}/${contacts.length})`
+                                            }
+                                        })
                                     }
                                     message = "Added All Contacts"
                                     messageColor = "green"
 
-                                    this.message.showMessage(message, 10000)
+                                    this.setState(prevState => {
+                                        return {
+                                            ...prevState,
+                                            spinner: false,
+                                            messageColor,
+                                            message
+                                        }
+                                    })
 
                                 } else {
                                     message = "No Backup Was Found In The Database"
                                     messageColor = "red"
 
-                                    this.message.showMessage(message, 10000)
+                                    this.setState(prevState => {
+                                        return {
+                                            ...prevState,
+                                            spinner: false,
+                                            messageColor,
+                                            message
+                                        }
+                                    })
                                 }
                             })
                         break
@@ -86,14 +122,28 @@ class Home extends React.Component {
                         message = "Permission Denied"
                         messageColor = "red"
 
-                        this.message.showMessage(message, 10000)
+                        this.setState(prevState => {
+                            return {
+                                ...prevState,
+                                spinner: false,
+                                messageColor,
+                                message
+                            }
+                        })
                         break
 
                     default:
                         message = `Unkown Error: \`${permission}\``
                         messageColor = "red"
 
-                        this.message.showMessage(message, 10000)
+                        this.setState(prevState => {
+                            return {
+                                ...prevState,
+                                spinner: false,
+                                messageColor,
+                                message
+                            }
+                        })
                         break
                 }
             })
@@ -102,7 +152,8 @@ class Home extends React.Component {
                     return {
                         ...prevState,
                         spinner: false,
-                        messageColor
+                        messageColor,
+                        message
                     }
                 })
             })
@@ -145,13 +196,27 @@ class Home extends React.Component {
                                     message = "Uploaded Contacts"
                                     messageColor = "green"
 
-                                    this.message.showMessage("Uploaded Contacts", 10000)
+                                    this.setState(prevState => {
+                                        return {
+                                            ...prevState,
+                                            spinner: false,
+                                            messageColor,
+                                            message
+                                        }
+                                    })
                                 })
                         } catch (e) {
                             message = `Unkown Error ${e.code}`
                             messageColor = "red"
 
-                            this.message.showMessage(`Unkown Error ${e.code}`, 10000)
+                            this.setState(prevState => {
+                                return {
+                                    ...prevState,
+                                    spinner: false,
+                                    messageColor,
+                                    message
+                                }
+                            })
                         }
                         break
                     
@@ -159,14 +224,27 @@ class Home extends React.Component {
                         message = "Permission Denied"
                         messageColor = "red"
 
-                        this.message.showMessage(message, 10000)
+                        this.setState(prevState => {
+                            return {
+                                ...prevState,
+                                spinner: false,
+                                messageColor,
+                                message
+                            }
+                        })
                         break
 
                     default:
                         message = `Unkown Error: \`${permission}\``
                         messageColor = "red"
-
-                        this.message.showMessage(message, 10000)
+                        this.setState(prevState => {
+                            return {
+                                ...prevState,
+                                spinner: false,
+                                messageColor,
+                                message
+                            }
+                        })
                         break
                 }
             })
@@ -175,11 +253,19 @@ class Home extends React.Component {
             return {
                 ...prevState,
                 spinner: false,
-                messageColor
+                messageColor,
+                message
             }
         })
 
-        this.message.showMessage(message, 5000)
+        this.setState(prevState => {
+            return {
+                ...prevState,
+                spinner: false,
+                messageColor,
+                message
+            }
+        })
     }
 
     onSignOut() {
@@ -198,40 +284,36 @@ class Home extends React.Component {
                         messageColor: "green"
                     }
                 })
-                this.message.showMessage("Signed Out Successfully!", 10000)
                 this.props.navigation.navigate("Login")
             })
             .catch(e => {
                 this.setState(prevState => {
                     return {
                         ...prevState,
-                        messageColor: "red"
+                        messageColor: "red",
+                        message: message
     
                     }
                 })
-                this.message.showMessage("Unknown Error: `" + e.code + "`", 10000)
             })
     }
 
     render() {
         return (
             <View style={styles.view} >
+                    <Text style={{
+                        backgroundColor: "#2C2F33",
+                        color: "#7289da",
+                        borderRadius: 5,
+                        padding: 5
+                    }}>{this.state.message || "Welcome!"}</Text>
                     <Logo />
                     <Button onPress={this.getContacts}>Get Contacts</Button>
                     <Button onPress={this.uploadContacts}>Upload Contacts</Button>
                     <Button onPress={this.onSignOut}>Sign Out</Button>
-                    <Message
-                        ref={message => this.message = message}
-                        animation={'slideY'}
-                        position={'top'}
-                        messageStyle={{
-                            backgroundColor: this.state.messageColor
-                        }}
-                    >
-                    </Message>
             </View>
         )
-    }
+    } 
 }
 
 export default Home
