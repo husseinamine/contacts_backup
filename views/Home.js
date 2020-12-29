@@ -3,8 +3,6 @@ import { View, StyleSheet, PermissionsAndroid, Text, ActivityIndicator } from "r
 import Logo from "../components/Logo"
 import Button from "../components/Button"
 import auth from "@react-native-firebase/auth"
-import Message from 'react-native-animated-message'
-import Spinner from 'react-native-loading-spinner-overlay'
 import Contacts from 'react-native-contacts'
 import firestore from '@react-native-firebase/firestore'
 
@@ -51,21 +49,9 @@ class Home extends React.Component {
 
         let message
         let messageColor
-        let permission
 
         Contacts.requestPermission()
-            .then((permissionGiven) => {
-                permission = permissionGiven
-
-                this.setState(prevState => {
-                    return {
-                        ...prevState,
-                        spinner: true,
-                        spinnerText: "Getting Contacts"
-                    }
-                })
-            })
-            .then(() => {
+            .then(async permission => {
                 switch (permission) {
                     case "authorized":
                         firestore()
@@ -167,14 +153,6 @@ class Home extends React.Component {
     uploadContacts() {
         let message
         let messageColor
-
-        this.setState(prevState => {
-            return {
-                ...prevState,
-                spinner: true,
-                spinnerText: "Uploading Contacts"
-            }
-        })
 
         Contacts.requestPermission()
             .then(async permission => {
