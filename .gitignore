@@ -59,4 +59,4 @@ CocoaPods
 /ios/Pods/
 node_modules
 android/app/google-services.json
-android/app/production.jks]
+android/app/production.jks
