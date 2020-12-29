@@ -5,7 +5,7 @@ const Input = (props) => {
     return (
         <TextInput
                 secureTextEntry={props.secure}
-                onChange={props.onChange}
+                onChangeText={props.onChange}
                 selectionColor="#7289da"
                 placeholderTextColor="#9c9c9c" 
                 placeholder={props.placeholder}
